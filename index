@@ -1,0 +1,3662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KENGROW File Manager | Secure Document Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* Light Theme Colors */
+            --primary-green: #1E7F4B;
+            --primary-green-light: #2E9F6B;
+            --primary-green-dark: #0E5F2B;
+            --secondary-green: #3CAF7F;
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #6c757d;
+            --darker-gray: #343a40;
+            --white: #ffffff;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --sidebar-width: 250px;
+            --header-height: 70px;
+            
+            /* Dark Theme Colors (default) */
+            --dark-bg: #121212;
+            --dark-surface: #1e1e1e;
+            --dark-surface-light: #2d2d2d;
+            --dark-text: #e0e0e0;
+            --dark-text-secondary: #a0a0a0;
+            --dark-border: #404040;
+        }
+        
+        /* Light Theme */
+        body {
+            background-color: var(--light-gray);
+            color: var(--darker-gray);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        /* Dark Theme */
+        body.dark-mode {
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--white);
+            border-right: 1px solid var(--medium-gray);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transition: transform 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+        }
+        
+        .dark-mode .sidebar {
+            background-color: var(--dark-surface);
+            border-right: 1px solid var(--dark-border);
+        }
+        
+        .logo-container {
+            padding: 20px;
+            border-bottom: 1px solid var(--medium-gray);
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary-green), var(--primary-green-light));
+        }
+        
+        .dark-mode .logo-container {
+            border-bottom: 1px solid var(--dark-border);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            color: var(--white);
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        .logo i {
+            margin-right: 10px;
+            font-size: 1.8rem;
+        }
+        
+        .company-name {
+            font-size: 1rem;
+            color: var(--white);
+            opacity: 0.9;
+            margin-top: 2px;
+        }
+        
+        .menu {
+            flex: 1;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+        
+        .menu-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            color: var(--darker-gray);
+            text-decoration: none;
+            transition: all 0.2s;
+            border-left: 4px solid transparent;
+        }
+        
+        .dark-mode .menu-item {
+            color: var(--dark-text);
+        }
+        
+        .menu-item:hover {
+            background-color: rgba(30, 127, 75, 0.05);
+            color: var(--primary-green);
+        }
+        
+        .dark-mode .menu-item:hover {
+            background-color: rgba(30, 127, 75, 0.15);
+        }
+        
+        .menu-item.active {
+            background-color: rgba(30, 127, 75, 0.1);
+            color: var(--primary-green);
+            border-left: 4px solid var(--primary-green);
+            font-weight: 600;
+        }
+        
+        .dark-mode .menu-item.active {
+            background-color: rgba(30, 127, 75, 0.2);
+        }
+        
+        .menu-item i {
+            width: 24px;
+            margin-right: 12px;
+            font-size: 1.2rem;
+        }
+        
+        .menu-divider {
+            height: 1px;
+            background-color: var(--medium-gray);
+            margin: 15px 20px;
+        }
+        
+        .dark-mode .menu-divider {
+            background-color: var(--dark-border);
+        }
+        
+        .user-profile {
+            padding: 20px;
+            border-top: 1px solid var(--medium-gray);
+            display: flex;
+            align-items: center;
+            background-color: rgba(30, 127, 75, 0.03);
+        }
+        
+        .dark-mode .user-profile {
+            border-top: 1px solid var(--dark-border);
+            background-color: rgba(30, 127, 75, 0.08);
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-green);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 12px;
+            position: relative;
+        }
+        
+        .user-status {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 2px solid var(--white);
+        }
+        
+        .status-online {
+            background-color: #2ecc71;
+        }
+        
+        .status-away {
+            background-color: #f39c12;
+        }
+        
+        .status-offline {
+            background-color: #95a5a6;
+        }
+        
+        .user-info h4 {
+            font-size: 0.95rem;
+            margin-bottom: 2px;
+        }
+        
+        .dark-mode .user-info h4 {
+            color: var(--dark-text);
+        }
+        
+        .user-info p {
+            font-size: 0.8rem;
+            color: var(--dark-gray);
+        }
+        
+        .dark-mode .user-info p {
+            color: var(--dark-text-secondary);
+        }
+        
+        .login-time {
+            font-size: 0.7rem;
+            color: var(--primary-green);
+            margin-top: 3px;
+        }
+        
+        /* Logout Button in Sidebar */
+        .logout-container {
+            padding: 15px 20px;
+            border-top: 1px solid var(--medium-gray);
+        }
+        
+        .dark-mode .logout-container {
+            border-top: 1px solid var(--dark-border);
+        }
+        
+        .logout-btn {
+            width: 100%;
+            padding: 10px 15px;
+            background-color: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.2);
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .logout-btn:hover {
+            background-color: rgba(231, 76, 60, 0.2);
+        }
+        
+        .logout-btn i {
+            margin-right: 8px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: margin-left 0.3s ease;
+        }
+        
+        .header {
+            height: var(--header-height);
+            background-color: var(--white);
+            border-bottom: 1px solid var(--medium-gray);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            position: sticky;
+            top: 0;
+            z-index: 99;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        
+        .dark-mode .header {
+            background-color: var(--dark-surface);
+            border-bottom: 1px solid var(--dark-border);
+        }
+        
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+            flex-wrap: wrap;
+        }
+        
+        .breadcrumb a {
+            color: var(--dark-gray);
+            text-decoration: none;
+        }
+        
+        .dark-mode .breadcrumb a {
+            color: var(--dark-text-secondary);
+        }
+        
+        .breadcrumb a:hover {
+            color: var(--primary-green);
+        }
+        
+        .breadcrumb-separator {
+            margin: 0 8px;
+            color: var(--dark-gray);
+        }
+        
+        .dark-mode .breadcrumb-separator {
+            color: var(--dark-text-secondary);
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .current-time {
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+            background-color: rgba(30, 127, 75, 0.05);
+            padding: 6px 12px;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+        
+        .dark-mode .current-time {
+            color: var(--dark-text-secondary);
+            background-color: rgba(30, 127, 75, 0.1);
+        }
+        
+        .current-time i {
+            margin-right: 6px;
+            color: var(--primary-green);
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-box input {
+            padding: 10px 15px 10px 40px;
+            border: 1px solid var(--medium-gray);
+            border-radius: var(--border-radius);
+            width: 300px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            background-color: var(--white);
+            color: var(--darker-gray);
+        }
+        
+        .dark-mode .search-box input {
+            background-color: var(--dark-surface-light);
+            border-color: var(--dark-border);
+            color: var(--dark-text);
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(30, 127, 75, 0.1);
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--dark-gray);
+        }
+        
+        .dark-mode .search-box i {
+            color: var(--dark-text-secondary);
+        }
+        
+        /* Notifications Bell & Dropdown */
+        .notifications-container {
+            position: relative;
+        }
+        
+        .notifications {
+            position: relative;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+        
+        .notifications:hover {
+            background-color: rgba(30, 127, 75, 0.1);
+        }
+        
+        .dark-mode .notifications:hover {
+            background-color: rgba(30, 127, 75, 0.2);
+        }
+        
+        .notifications i {
+            font-size: 1.2rem;
+            color: var(--dark-gray);
+        }
+        
+        .dark-mode .notifications i {
+            color: var(--dark-text-secondary);
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background-color: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            border: 2px solid var(--white);
+        }
+        
+        .dark-mode .notification-badge {
+            border: 2px solid var(--dark-surface);
+        }
+        
+        /* Notifications Dropdown */
+        .notifications-dropdown {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            width: 380px;
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border: 1px solid var(--medium-gray);
+            z-index: 1000;
+            display: none;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .dark-mode .notifications-dropdown {
+            background-color: var(--dark-surface);
+            border: 1px solid var(--dark-border);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .notifications-dropdown.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .content {
+            padding: 30px;
+            min-height: calc(100vh - var(--header-height));
+        }
+        
+        .page-title {
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .page-title h1 {
+            font-size: 1.8rem;
+            color: var(--darker-gray);
+        }
+        
+        .dark-mode .page-title h1 {
+            color: var(--dark-text);
+        }
+        
+        .page-title .subtitle {
+            color: var(--dark-gray);
+            font-size: 1rem;
+            font-weight: normal;
+        }
+        
+        .dark-mode .page-title .subtitle {
+            color: var(--dark-text-secondary);
+        }
+        
+        /* Dashboard Styles */
+        .dashboard-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s, background-color 0.3s;
+        }
+        
+        .dark-mode .stat-card {
+            background-color: var(--dark-surface);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .stat-icon.documents {
+            background-color: rgba(30, 127, 75, 0.1);
+            color: var(--primary-green);
+        }
+        
+        .stat-icon.storage {
+            background-color: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+        }
+        
+        .stat-icon.pending {
+            background-color: rgba(241, 196, 15, 0.1);
+            color: #f1c40f;
+        }
+        
+        .stat-icon.uploads {
+            background-color: rgba(155, 89, 182, 0.1);
+            color: #9b59b6;
+        }
+        
+        .stat-info h3 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .dark-mode .stat-info h3 {
+            color: var(--dark-text);
+        }
+        
+        .stat-info p {
+            color: var(--dark-gray);
+            font-size: 0.9rem;
+        }
+        
+        .dark-mode .stat-info p {
+            color: var(--dark-text-secondary);
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-green);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-green-light);
+        }
+        
+        .btn-secondary {
+            background-color: var(--white);
+            color: var(--darker-gray);
+            border: 1px solid var(--medium-gray);
+        }
+        
+        .dark-mode .btn-secondary {
+            background-color: var(--dark-surface);
+            color: var(--dark-text);
+            border: 1px solid var(--dark-border);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--medium-gray);
+        }
+        
+        .dark-mode .btn-secondary:hover {
+            background-color: var(--dark-surface-light);
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-success {
+            background-color: #27ae60;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #219653;
+        }
+        
+        .dashboard-sections {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 1200px) {
+            .dashboard-sections {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .section-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 30px;
+            transition: background-color 0.3s;
+        }
+        
+        .dark-mode .section-card {
+            background-color: var(--dark-surface);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .section-card h2 {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: var(--darker-gray);
+            display: flex;
+            align-items: center;
+        }
+        
+        .dark-mode .section-card h2 {
+            color: var(--dark-text);
+        }
+        
+        .section-card h2 i {
+            margin-right: 10px;
+            color: var(--primary-green);
+        }
+        
+        /* Theme Toggle */
+        .theme-toggle {
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: var(--dark-gray);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+        
+        .theme-toggle:hover {
+            background-color: rgba(30, 127, 75, 0.1);
+        }
+        
+        .dark-mode .theme-toggle:hover {
+            background-color: rgba(30, 127, 75, 0.2);
+        }
+        
+        .dark-mode .theme-toggle {
+            color: var(--dark-text-secondary);
+        }
+        
+        /* Online Users Section */
+        .online-users {
+            margin-top: 20px;
+        }
+        
+        .user-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .user-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            border-radius: var(--border-radius);
+            background-color: var(--light-gray);
+            transition: all 0.2s;
+        }
+        
+        .dark-mode .user-item {
+            background-color: var(--dark-surface-light);
+        }
+        
+        .user-item:hover {
+            background-color: rgba(30, 127, 75, 0.05);
+        }
+        
+        .dark-mode .user-item:hover {
+            background-color: rgba(30, 127, 75, 0.1);
+        }
+        
+        .user-item-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary-green);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 12px;
+            font-size: 0.9rem;
+            position: relative;
+        }
+        
+        .user-item-status {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 2px solid var(--white);
+        }
+        
+        .user-item-info h4 {
+            font-size: 0.9rem;
+            margin-bottom: 2px;
+        }
+        
+        .dark-mode .user-item-info h4 {
+            color: var(--dark-text);
+        }
+        
+        .user-item-info p {
+            font-size: 0.75rem;
+            color: var(--dark-gray);
+        }
+        
+        .dark-mode .user-item-info p {
+            color: var(--dark-text-secondary);
+        }
+        
+        .user-item-role {
+            font-size: 0.7rem;
+            background-color: rgba(30, 127, 75, 0.1);
+            color: var(--primary-green);
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: auto;
+            font-weight: 600;
+        }
+        
+        .online-count {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        
+        .dark-mode .online-count {
+            border-bottom: 1px solid var(--dark-border);
+        }
+        
+        .online-count h3 {
+            font-size: 1.2rem;
+            color: var(--darker-gray);
+        }
+        
+        .dark-mode .online-count h3 {
+            color: var(--dark-text);
+        }
+        
+        .online-count .badge {
+            background-color: var(--primary-green);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        /* Document List Styles */
+        .document-list {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        
+        .document-list th {
+            text-align: left;
+            padding: 15px;
+            border-bottom: 2px solid var(--medium-gray);
+            color: var(--darker-gray);
+            font-weight: 600;
+        }
+        
+        .dark-mode .document-list th {
+            border-bottom: 2px solid var(--dark-border);
+            color: var(--dark-text);
+        }
+        
+        .document-list td {
+            padding: 15px;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        
+        .dark-mode .document-list td {
+            border-bottom: 1px solid var(--dark-border);
+        }
+        
+        .document-list tr:hover {
+            background-color: rgba(30, 127, 75, 0.03);
+        }
+        
+        .dark-mode .document-list tr:hover {
+            background-color: rgba(30, 127, 75, 0.08);
+        }
+        
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .file-icon.pdf {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+        
+        .file-icon.docx {
+            background-color: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+        }
+        
+        .file-icon.jpg {
+            background-color: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+        
+        .file-icon.html {
+            background-color: rgba(241, 196, 15, 0.1);
+            color: #f1c40f;
+        }
+        
+        .file-icon.txt {
+            background-color: rgba(149, 165, 166, 0.1);
+            color: #95a5a6;
+        }
+        
+        .file-icon.xlsx {
+            background-color: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+        }
+        
+        .file-icon.folder {
+            background-color: rgba(155, 89, 182, 0.1);
+            color: #9b59b6;
+        }
+        
+        .file-name {
+            display: flex;
+            align-items: center;
+        }
+        
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background-color: rgba(46, 204, 113, 0.1);
+            color: #27ae60;
+        }
+        
+        .status-pending {
+            background-color: rgba(241, 196, 15, 0.1);
+            color: #f39c12;
+        }
+        
+        .status-archived {
+            background-color: rgba(149, 165, 166, 0.1);
+            color: #7f8c8d;
+        }
+        
+        .status-approved {
+            background-color: rgba(52, 152, 219, 0.1);
+            color: #2980b9;
+        }
+        
+        .status-rejected {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: #c0392b;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--medium-gray);
+            color: var(--darker-gray);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+        
+        .action-btn:hover {
+            background-color: var(--primary-green);
+            color: white;
+        }
+        
+        .dark-mode .action-btn {
+            background-color: var(--dark-surface-light);
+            color: var(--dark-text);
+        }
+        
+        /* Users Page Specific Styles */
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        
+        .users-table th {
+            text-align: left;
+            padding: 15px;
+            border-bottom: 2px solid var(--medium-gray);
+            color: var(--darker-gray);
+            font-weight: 600;
+        }
+        
+        .dark-mode .users-table th {
+            border-bottom: 2px solid var(--dark-border);
+            color: var(--dark-text);
+        }
+        
+        .users-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        
+        .dark-mode .users-table td {
+            border-bottom: 1px solid var(--dark-border);
+        }
+        
+        .users-table tr:hover {
+            background-color: rgba(30, 127, 75, 0.03);
+        }
+        
+        .dark-mode .users-table tr:hover {
+            background-color: rgba(30, 127, 75, 0.08);
+        }
+        
+        .user-role-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .role-admin {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: #c0392b;
+        }
+        
+        .role-manager {
+            background-color: rgba(52, 152, 219, 0.1);
+            color: #2980b9;
+        }
+        
+        .role-staff {
+            background-color: rgba(46, 204, 113, 0.1);
+            color: #27ae60;
+        }
+        
+        .role-guest {
+            background-color: rgba(149, 165, 166, 0.1);
+            color: #7f8c8d;
+        }
+        
+        /* Login Page */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--light-gray);
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(30, 127, 75, 0.05) 0%, rgba(46, 159, 107, 0.05) 100%);
+            transition: background-color 0.3s ease;
+        }
+        
+        .dark-mode .login-container {
+            background-color: var(--dark-bg);
+            background: linear-gradient(135deg, rgba(30, 127, 75, 0.05) 0%, rgba(46, 159, 107, 0.05) 100%);
+        }
+        
+        .login-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            transition: background-color 0.3s;
+        }
+        
+        .dark-mode .login-card {
+            background-color: var(--dark-surface);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .login-logo {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--primary-green);
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        
+        .login-logo .company {
+            display: block;
+            font-size: 1rem;
+            color: var(--dark-gray);
+            font-weight: normal;
+            margin-top: 5px;
+        }
+        
+        .dark-mode .login-logo .company {
+            color: var(--dark-text-secondary);
+        }
+        
+        .login-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--darker-gray);
+        }
+        
+        .dark-mode .login-title {
+            color: var(--dark-text);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--darker-gray);
+        }
+        
+        .dark-mode .form-group label {
+            color: var(--dark-text);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--medium-gray);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: all 0.3s;
+            background-color: var(--white);
+            color: var(--darker-gray);
+        }
+        
+        .dark-mode .form-control {
+            background-color: var(--dark-surface-light);
+            border-color: var(--dark-border);
+            color: var(--dark-text);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(30, 127, 75, 0.1);
+        }
+        
+        .forgot-password {
+            text-align: right;
+            margin-top: 5px;
+        }
+        
+        .forgot-password a {
+            color: var(--primary-green);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            margin-top: 10px;
+            background-color: var(--primary-green);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .login-btn:hover {
+            background-color: var(--primary-green-light);
+        }
+        
+        .role-selection {
+            margin-top: 20px;
+        }
+        
+        .role-options {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .role-option {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            border: 2px solid var(--medium-gray);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.2s;
+            background-color: var(--white);
+        }
+        
+        .dark-mode .role-option {
+            background-color: var(--dark-surface);
+            border-color: var(--dark-border);
+        }
+        
+        .role-option:hover {
+            border-color: var(--primary-green);
+        }
+        
+        .role-option.selected {
+            border-color: var(--primary-green);
+            background-color: rgba(30, 127, 75, 0.05);
+        }
+        
+        .dark-mode .role-option.selected {
+            background-color: rgba(30, 127, 75, 0.15);
+        }
+        
+        .role-option i {
+            font-size: 1.5rem;
+            color: var(--primary-green);
+            margin-bottom: 10px;
+        }
+        
+        /* Mobile Responsiveness */
+        .mobile-toggle {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--darker-gray);
+        }
+        
+        .dark-mode .mobile-toggle {
+            color: var(--dark-text);
+        }
+        
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .mobile-toggle {
+                display: block;
+                margin-right: 15px;
+            }
+            
+            .search-box input {
+                width: 200px;
+            }
+            
+            .dashboard-overview {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+            
+            .current-time {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 0 15px;
+            }
+            
+            .content {
+                padding: 20px 15px;
+            }
+            
+            .search-box input {
+                width: 150px;
+            }
+            
+            .dashboard-overview {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .quick-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .document-list, .users-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .dashboard-overview {
+                grid-template-columns: 1fr;
+            }
+            
+            .login-card {
+                padding: 25px;
+            }
+            
+            .role-options {
+                flex-direction: column;
+            }
+            
+            .header-actions {
+                gap: 10px;
+            }
+        }
+        
+        /* Footer */
+        .footer {
+            background-color: var(--white);
+            border-top: 1px solid var(--medium-gray);
+            padding: 20px 30px;
+            margin-left: var(--sidebar-width);
+            transition: margin-left 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+        }
+        
+        .dark-mode .footer {
+            background-color: var(--dark-surface);
+            border-top: 1px solid var(--dark-border);
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .footer-links a {
+            color: var(--dark-gray);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .dark-mode .footer-links a {
+            color: var(--dark-text-secondary);
+        }
+        
+        .footer-links a:hover {
+            color: var(--primary-green);
+        }
+        
+        .footer-version {
+            color: var(--dark-gray);
+            font-size: 0.9rem;
+        }
+        
+        .dark-mode .footer-version {
+            color: var(--dark-text-secondary);
+        }
+        
+        .copyright {
+            color: var(--dark-gray);
+            font-size: 0.9rem;
+        }
+        
+        .dark-mode .copyright {
+            color: var(--dark-text-secondary);
+        }
+        
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .mt-20 {
+            margin-top: 20px;
+        }
+        
+        .mb-20 {
+            margin-bottom: 20px;
+        }
+        
+        .color-primary {
+            color: var(--primary-green);
+        }
+        
+        .bg-light {
+            background-color: var(--light-gray);
+        }
+        
+        /* Folder Structure */
+        .folder-structure {
+            margin-top: 20px;
+        }
+        
+        .folder-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .folder-item:hover {
+            background-color: rgba(30, 127, 75, 0.05);
+        }
+        
+        .dark-mode .folder-item:hover {
+            background-color: rgba(30, 127, 75, 0.1);
+        }
+        
+        .folder-item i {
+            color: var(--primary-green);
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        /* Charts */
+        .chart-container {
+            height: 300px;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .chart-placeholder {
+            height: 100%;
+            background-color: var(--light-gray);
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--dark-gray);
+        }
+        
+        .dark-mode .chart-placeholder {
+            background-color: var(--dark-surface-light);
+            color: var(--dark-text-secondary);
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--dark-gray);
+        }
+        
+        .dark-mode .empty-state {
+            color: var(--dark-text-secondary);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--medium-gray);
+            margin-bottom: 15px;
+        }
+        
+        .dark-mode .empty-state i {
+            color: var(--dark-border);
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+        
+        .dark-mode .modal {
+            background-color: var(--dark-surface);
+        }
+        
+        .modal-overlay.show .modal {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--medium-gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .dark-mode .modal-header {
+            border-bottom: 1px solid var(--dark-border);
+        }
+        
+        .modal-header h3 {
+            font-size: 1.4rem;
+            color: var(--darker-gray);
+        }
+        
+        .dark-mode .modal-header h3 {
+            color: var(--dark-text);
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: var(--dark-gray);
+            cursor: pointer;
+        }
+        
+        .dark-mode .modal-close {
+            color: var(--dark-text-secondary);
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid var(--medium-gray);
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+        
+        .dark-mode .modal-footer {
+            border-top: 1px solid var(--dark-border);
+        }
+        
+        /* Logout Modal */
+        .logout-modal .modal {
+            max-width: 400px;
+        }
+        
+        .logout-modal-content {
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        .logout-modal-content i {
+            font-size: 3rem;
+            color: #e74c3c;
+            margin-bottom: 15px;
+        }
+        
+        .logout-modal-content h3 {
+            margin-bottom: 10px;
+            color: var(--darker-gray);
+        }
+        
+        .dark-mode .logout-modal-content h3 {
+            color: var(--dark-text);
+        }
+        
+        .logout-modal-content p {
+            color: var(--dark-gray);
+            margin-bottom: 20px;
+        }
+        
+        .dark-mode .logout-modal-content p {
+            color: var(--dark-text-secondary);
+        }
+        
+        /* Notification Animation */
+        @keyframes bellRing {
+            0% { transform: rotate(0); }
+            10% { transform: rotate(10deg); }
+            20% { transform: rotate(-10deg); }
+            30% { transform: rotate(10deg); }
+            40% { transform: rotate(-10deg); }
+            50% { transform: rotate(0); }
+            100% { transform: rotate(0); }
+        }
+        
+        .bell-ringing {
+            animation: bellRing 0.5s ease-in-out;
+        }
+        
+        /* Notification Toast */
+        .notification-toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            padding: 15px 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            max-width: 350px;
+            z-index: 9999;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            border-left: 4px solid var(--primary-green);
+        }
+        
+        .dark-mode .notification-toast {
+            background-color: var(--dark-surface);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .notification-toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        /* Active Users Badge */
+        .active-users-badge {
+            display: inline-flex;
+            align-items: center;
+            background-color: rgba(46, 204, 113, 0.1);
+            color: #27ae60;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .active-users-badge i {
+            margin-right: 5px;
+        }
+        
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        .pagination-btn {
+            padding: 8px 15px;
+            background-color: var(--white);
+            border: 1px solid var(--medium-gray);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .dark-mode .pagination-btn {
+            background-color: var(--dark-surface);
+            border: 1px solid var(--dark-border);
+            color: var(--dark-text);
+        }
+        
+        .pagination-btn:hover {
+            background-color: var(--primary-green);
+            color: white;
+            border-color: var(--primary-green);
+        }
+        
+        .pagination-btn.active {
+            background-color: var(--primary-green);
+            color: white;
+            border-color: var(--primary-green);
+        }
+        
+        .pagination-info {
+            color: var(--dark-gray);
+            font-size: 0.9rem;
+        }
+        
+        .dark-mode .pagination-info {
+            color: var(--dark-text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page (Initial View) -->
+    <div id="loginPage" class="login-container">
+        <div class="login-card">
+            <div class="login-logo">
+                <i class="fas fa-folder"></i> KENGROW File Manager
+                <span class="company">Secure Document Management System</span>
+            </div>
+            <h2 class="login-title">Sign in to your account</h2>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email / Username</label>
+                    <input type="text" id="email" class="form-control" placeholder="Enter your email or username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="Enter your password" required>
+                    <div class="forgot-password">
+                        <a href="#" id="forgotPassword">Forgot Password?</a>
+                    </div>
+                </div>
+                
+                <div class="two-factor">
+                    <div class="form-group">
+                        <label for="twoFactorCode">Two-Factor Authentication (Optional)</label>
+                        <input type="text" id="twoFactorCode" class="form-control" placeholder="Enter 6-digit code">
+                    </div>
+                </div>
+                
+                <div class="role-selection" id="roleSelection">
+                    <label>Select your role:</label>
+                    <div class="role-options">
+                        <div class="role-option" data-role="admin">
+                            <i class="fas fa-user-shield"></i>
+                            <p>Admin</p>
+                        </div>
+                        <div class="role-option" data-role="manager">
+                            <i class="fas fa-user-tie"></i>
+                            <p>Manager</p>
+                        </div>
+                        <div class="role-option" data-role="staff">
+                            <i class="fas fa-user"></i>
+                            <p>Staff</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="login-btn">Sign In</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Main Application (Hidden Initially) -->
+    <div id="appContainer" class="hidden">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar" id="sidebar">
+            <div class="logo-container">
+                <div class="logo">
+                    <i class="fas fa-folder"></i> KENGROW
+                </div>
+            </div>
+            
+            <div class="menu">
+                <a href="#" class="menu-item active" data-page="dashboard">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a href="#" class="menu-item" data-page="documents">
+                    <i class="fas fa-file"></i> Documents
+                </a>
+                <a href="#" class="menu-item" data-page="folders">
+                    <i class="fas fa-folder-open"></i> Folders
+                </a>
+                <a href="#" class="menu-item" data-page="upload">
+                    <i class="fas fa-upload"></i> Upload
+                </a>
+                <a href="#" class="menu-item" data-page="search">
+                    <i class="fas fa-search"></i> Search
+                </a>
+                
+                <div class="menu-divider"></div>
+                
+                <a href="#" class="menu-item" data-page="workflows">
+                    <i class="fas fa-tasks"></i> Workflows
+                </a>
+                <a href="#" class="menu-item" data-page="archive">
+                    <i class="fas fa-archive"></i> Archive
+                </a>
+                <a href="#" class="menu-item" data-page="reports">
+                    <i class="fas fa-chart-bar"></i> Reports
+                </a>
+                
+                <div class="menu-divider"></div>
+                
+                <a href="#" class="menu-item admin-only" data-page="users">
+                    <i class="fas fa-users"></i> Users
+                </a>
+                <a href="#" class="menu-item" data-page="settings">
+                    <i class="fas fa-cog"></i> Settings
+                </a>
+            </div>
+            
+            <div class="user-profile">
+                <div class="user-avatar" id="userAvatar">
+                    AU
+                    <div class="user-status status-online"></div>
+                </div>
+                <div class="user-info">
+                    <h4 id="loggedInUserName">Amyya U. Wu</h4>
+                    <p id="loggedInUserRole">Administrator</p>
+                    <div class="login-time" id="loginTimeDisplay">Logged in: Today, 09:42 AM</div>
+                </div>
+            </div>
+            
+            <!-- Logout Button -->
+            <div class="logout-container">
+                <button class="logout-btn" id="sidebarLogoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="breadcrumb-container">
+                    <div class="mobile-toggle" id="mobileToggle">
+                        <i class="fas fa-bars"></i>
+                    </div>
+                    <div class="breadcrumb">
+                        <a href="#" id="homeCrumb">Dashboard</a>
+                        <span class="breadcrumb-separator">/</span>
+                        <span id="pageCrumb">Home</span>
+                        <span class="active-users-badge" id="activeUsersBadge">
+                            <i class="fas fa-user-friends"></i> <span id="onlineCount">5</span> online
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="header-actions">
+                    <div class="current-time" id="currentTime">
+                        <i class="fas fa-clock"></i> <span id="timeDisplay">Loading...</span>
+                    </div>
+                    
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="globalSearch" placeholder="Search files and folders...">
+                    </div>
+                    
+                    <!-- Notifications Container -->
+                    <div class="notifications-container">
+                        <div class="notifications" id="notificationsBell">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge" id="notificationBadge">3</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Theme Toggle -->
+                    <div class="theme-toggle" id="themeToggle">
+                        <i class="fas fa-moon" id="themeIcon"></i>
+                    </div>
+                    
+                    <!-- Header Logout Button (Mobile) -->
+                    <button class="logout-btn" id="headerLogoutBtn" style="display: none;">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Content Area (Dynamic) -->
+            <div class="content" id="contentArea">
+                <!-- Dashboard Page -->
+                <div id="dashboardPage" class="page-content">
+                    <div class="page-title">
+                        <div>
+                            <h1>Dashboard <span class="subtitle">Welcome back, <span id="dashboardUserName">Amyya</span>!</span></h1>
+                            <p>Overview of your document activity and system status</p>
+                        </div>
+                        <div class="quick-actions">
+                            <button class="btn btn-primary" id="uploadBtn">
+                                <i class="fas fa-upload"></i> Upload Document
+                            </button>
+                            <button class="btn btn-secondary" id="searchBtn">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                            <button class="btn btn-secondary" id="createFolderBtn">
+                                <i class="fas fa-folder-plus"></i> Create Folder
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-overview">
+                        <div class="stat-card">
+                            <div class="stat-icon documents">
+                                <i class="fas fa-file"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>1,247</h3>
+                                <p>Total Documents</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon storage">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>78%</h3>
+                                <p>Storage Usage</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon pending">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>12</h3>
+                                <p>Pending Approvals</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon uploads">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>24</h3>
+                                <p>Recent Uploads</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-sections">
+                        <div>
+                            <div class="section-card">
+                                <h2><i class="fas fa-history"></i> Recently Uploaded Documents</h2>
+                                <p class="mb-20">Files added in the last 7 days</p>
+                                <table class="document-list">
+                                    <thead>
+                                        <tr>
+                                            <th>File Name</th>
+                                            <th>Type</th>
+                                            <th>Department</th>
+                                            <th>Last Modified</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="file-name">
+                                                    <div class="file-icon pdf">
+                                                        <i class="fas fa-file-pdf"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div>Benzah Vol.32.pdf</div>
+                                                        <div class="file-size">2.4 MB</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>PDF</td>
+                                            <td>Finance</td>
+                                            <td>2025/06/09</td>
+                                            <td><span class="status-badge status-active">Active</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="file-name">
+                                                    <div class="file-icon docx">
+                                                        <i class="fas fa-file-word"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div>Imelior Dec 21.docx</div>
+                                                        <div class="file-size">1.8 MB</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>DOCX</td>
+                                            <td>Marketing</td>
+                                            <td>2025/06/09</td>
+                                            <td><span class="status-badge status-pending">Pending</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="file-name">
+                                                    <div class="file-icon jpg">
+                                                        <i class="fas fa-file-image"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div>Screenlink12.jpg</div>
+                                                        <div class="file-size">3.1 MB</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>JPG</td>
+                                            <td>Design</td>
+                                            <td>2025/06/08</td>
+                                            <td><span class="status-badge status-active">Active</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="file-name">
+                                                    <div class="file-icon html">
+                                                        <i class="fas fa-file-code"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div>Landing Page.html</div>
+                                                        <div class="file-size">45 KB</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>HTML</td>
+                                            <td>Development</td>
+                                            <td>2025/06/08</td>
+                                            <td><span class="status-badge status-active">Active</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="section-card">
+                                <h2><i class="fas fa-chart-line"></i> Activity Overview</h2>
+                                <div class="chart-container">
+                                    <div class="chart-placeholder">
+                                        <div>
+                                            <i class="fas fa-chart-bar fa-3x mb-20"></i>
+                                            <p>Document activity chart would appear here</p>
+                                            <p class="mt-20">Showing views, downloads, and edits over time</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="section-card">
+                                <h2><i class="fas fa-user-friends"></i> Currently Online <span class="badge" id="onlineUsersCount">5</span></h2>
+                                <p class="mb-20">Users active in the last 15 minutes</p>
+                                <div class="online-users">
+                                    <div class="user-list" id="onlineUsersList">
+                                        <!-- Online users will be populated by JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="section-card">
+                                <h2><i class="fas fa-folder"></i> Recent Folders</h2>
+                                <p class="mb-20">Most recently accessed folders</p>
+                                <div class="folder-structure">
+                                    <div class="folder-item">
+                                        <i class="fas fa-folder"></i> Secret Folder
+                                        <span class="user-item-role" style="margin-left: auto;">Private</span>
+                                    </div>
+                                    <div class="folder-item">
+                                        <i class="fas fa-folder"></i> Public Files
+                                        <span class="user-item-role" style="margin-left: auto;">Shared</span>
+                                    </div>
+                                    <div class="folder-item">
+                                        <i class="fas fa-folder"></i> Accounts
+                                        <span class="user-item-role" style="margin-left: auto;">Finance</span>
+                                    </div>
+                                    <div class="folder-item">
+                                        <i class="fas fa-folder"></i> Archive 2024
+                                        <span class="user-item-role" style="margin-left: auto;">Archived</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="section-card">
+                                <h2><i class="fas fa-chart-pie"></i> File Insights</h2>
+                                <div class="mt-20">
+                                    <h3>6,712 <span class="color-primary">Total Views</span></h3>
+                                    <p class="mb-20">100% increase from last week</p>
+                                    
+                                    <div class="folder-structure">
+                                        <div class="folder-item">
+                                            <i class="fas fa-eye"></i> Total Views: 6,712
+                                        </div>
+                                        <div class="folder-item">
+                                            <i class="fas fa-edit"></i> Edits: 342
+                                        </div>
+                                        <div class="folder-item">
+                                            <i class="fas fa-comment"></i> Comments: 89
+                                        </div>
+                                        <div class="folder-item">
+                                            <i class="fas fa-download"></i> Downloads: 1,245
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Documents Page -->
+                <div id="documentsPage" class="page-content hidden">
+                    <div class="page-title">
+                        <h1>Documents <span class="subtitle">Manage all your files and documents</span></h1>
+                        <div class="quick-actions">
+                            <button class="btn btn-primary" id="uploadDocumentBtn">
+                                <i class="fas fa-upload"></i> Upload
+                            </button>
+                            <button class="btn btn-secondary" id="filterDocumentBtn">
+                                <i class="fas fa-filter"></i> Filter
+                            </button>
+                            <button class="btn btn-secondary" id="newFolderBtn">
+                                <i class="fas fa-folder-plus"></i> New Folder
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="section-card">
+                        <h2><i class="fas fa-file-alt"></i> All Documents <span class="badge">1,247 files</span></h2>
+                        <p class="mb-20">Browse, search, and manage all documents in the system</p>
+                        
+                        <div class="quick-actions mb-20">
+                            <button class="btn btn-secondary">
+                                <i class="fas fa-th"></i> Grid View
+                            </button>
+                            <button class="btn btn-secondary active">
+                                <i class="fas fa-list"></i> List View
+                            </button>
+                            <button class="btn btn-secondary">
+                                <i class="fas fa-sort-amount-down"></i> Sort
+                            </button>
+                        </div>
+                        
+                        <table class="document-list">
+                            <thead>
+                                <tr>
+                                    <th>File Name</th>
+                                    <th>Type</th>
+                                    <th>Department</th>
+                                    <th>Owner</th>
+                                    <th>Last Modified</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="file-name">
+                                            <div class="file-icon pdf">
+                                                <i class="fas fa-file-pdf"></i>
+                                            </div>
+                                            <div>
+                                                <div>Benzah Vol.32.pdf</div>
+                                                <div class="file-size">2.4 MB</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>PDF</td>
+                                    <td>Finance</td>
+                                    <td>John Doe</td>
+                                    <td>2025/06/09</td>
+                                    <td><span class="status-badge status-active">Active</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="action-btn" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn" title="Download">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                            <button class="action-btn" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="file-name">
+                                            <div class="file-icon txt">
+                                                <i class="fas fa-file-alt"></i>
+                                            </div>
+                                            <div>
+                                                <div>Browse.txt</div>
+                                                <div class="file-size">15 KB</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>TXT</td>
+                                    <td>IT</td>
+                                    <td>Jane Smith</td>
+                                    <td>2025/06/08</td>
+                                    <td><span class="status-badge status-active">Active</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="action-btn" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn" title="Download">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                            <button class="action-btn" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="file-name">
+                                            <div class="file-icon xlsx">
+                                                <i class="fas fa-file-excel"></i>
+                                            </div>
+                                            <div>
+                                                <div>Q2 Financial Report.xlsx</div>
+                                                <div class="file-size">3.7 MB</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>XLSX</td>
+                                    <td>Finance</td>
+                                    <td>Robert Johnson</td>
+                                    <td>2025/06/07</td>
+                                    <td><span class="status-badge status-pending">Pending Review</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="action-btn" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn" title="Download">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                            <button class="action-btn" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="file-name">
+                                            <div class="file-icon folder">
+                                                <i class="fas fa-folder"></i>
+                                            </div>
+                                            <div>
+                                                <div>Client Contracts</div>
+                                                <div class="file-size">24 files</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Folder</td>
+                                    <td>Legal</td>
+                                    <td>Sarah Williams</td>
+                                    <td>2025/06/05</td>
+                                    <td><span class="status-badge status-active">Active</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="action-btn" title="Open">
+                                                <i class="fas fa-folder-open"></i>
+                                            </button>
+                                            <button class="action-btn" title="Share">
+                                                <i class="fas fa-share"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <div class="pagination">
+                            <button class="pagination-btn"><i class="fas fa-chevron-left"></i></button>
+                            <button class="pagination-btn active">1</button>
+                            <button class="pagination-btn">2</button>
+                            <button class="pagination-btn">3</button>
+                            <span class="pagination-info">...</span>
+                            <button class="pagination-btn">10</button>
+                            <button class="pagination-btn"><i class="fas fa-chevron-right"></i></button>
+                            <span class="pagination-info">Showing 1-10 of 1,247 documents</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Users Page (Admin Only) -->
+                <div id="usersPage" class="page-content hidden">
+                    <div class="page-title">
+                        <h1>User Management <span class="subtitle">Manage system users and permissions</span></h1>
+                        <div class="quick-actions">
+                            <button class="btn btn-primary" id="addUserBtn">
+                                <i class="fas fa-user-plus"></i> Add User
+                            </button>
+                            <button class="btn btn-secondary" id="importUsersBtn">
+                                <i class="fas fa-file-import"></i> Import Users
+                            </button>
+                            <button class="btn btn-secondary" id="exportUsersBtn">
+                                <i class="fas fa-file-export"></i> Export
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="section-card">
+                        <h2><i class="fas fa-users"></i> All Users <span class="badge">342 users</span></h2>
+                        <p class="mb-20">Manage user accounts, roles, and permissions across the system</p>
+                        
+                        <div class="quick-actions mb-20">
+                            <button class="btn btn-secondary active">
+                                <i class="fas fa-list"></i> All Users
+                            </button>
+                            <button class="btn btn-secondary">
+                                <i class="fas fa-user-check"></i> Active
+                            </button>
+                            <button class="fas fa-user-clock"></i> Inactive
+                            </button>
+                            <button class="btn btn-secondary">
+                                <i class="fas fa-filter"></i> Filter
+                            </button>
+                        </div>
+                        
+                        <table class="users-table">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Department</th>
+                                    <th>Last Active</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="file-name">
+                                            <div class="user-item-avatar" style="background-color: #1E7F4B;">
+                                                AU
+                                            </div>
+                                            <div>
+                                                <div>Amyya U. Wu</div>
+                                                <div class="file-size">ID: KEN-001</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>amyya.wu@kengrow.com</td>
+                                    <td><span class="user-role-badge role-admin">Admin</span></td>
+                                    <td>Administration</td>
+                                    <td>Today, 09:42 AM</td>
+                                    <td><span class="status-badge status-active">Active</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="action-btn" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn" title="Permissions">
+                                                <i class="fas fa-user-lock"></i>
+                                            </button>
+                                            <button class="action-btn" title="Delete" style="background-color: rgba(231, 76, 60, 0.1); color: #e74c3c;">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="file-name">
+                                            <div class="user-item-avatar" style="background-color: #3498db;">
+                                                JS
+                                            </div>
+                                            <div>
+                                                <div>John Smith</div>
+                                                <div class="file-size">ID: KEN-002</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>john.smith@kengrow.com</td>
+                                    <td><span class="user-role-badge role-manager">Manager</span></td>
+                                    <td>Finance</td>
+                                    <td>Today, 08:15 AM</td>
+                                    <td><span class="status-badge status-active">Active</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="action-btn" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn" title="Permissions">
+                                                <i class="fas fa-user-lock"></i>
+                                            </button>
+                                            <button class="action-btn" title="Delete" style="background-color: rgba(231, 76, 60, 0.1); color: #e74c3c;">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="file-name">
+                                            <div class="user-item-avatar" style="background-color: #9b59b6;">
+                                                MG
+                                            </div>
+                                            <div>
+                                                <div>Maria Garcia</div>
+                                                <div class="file-size">ID: KEN-003</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>maria.garcia@kengrow.com</td>
+                                    <td><span class="user-role-badge role-staff">Staff</span></td>
+                                    <td>Marketing</td>
+                                    <td>Yesterday, 05:30 PM</td>
+                                    <td><span class="status-badge status-active">Active</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="action-btn" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn" title="Permissions">
+                                                <i class="fas fa-user-lock"></i>
+                                            </button>
+                                            <button class="action-btn" title="Delete" style="background-color: rgba(231, 76, 60, 0.1); color: #e74c3c;">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="file-name">
+                                            <div class="user-item-avatar" style="background-color: #e74c3c;">
+                                                DC
+                                            </div>
+                                            <div>
+                                                <div>David Chen</div>
+                                                <div class="file-size">ID: KEN-004</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>david.chen@kengrow.com</td>
+                                    <td><span class="user-role-badge role-staff">Staff</span></td>
+                                    <td>IT</td>
+                                    <td>Yesterday, 03:20 PM</td>
+                                    <td><span class="status-badge status-away">Away</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="action-btn" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn" title="Permissions">
+                                                <i class="fas fa-user-lock"></i>
+                                            </button>
+                                            <button class="action-btn" title="Delete" style="background-color: rgba(231, 76, 60, 0.1); color: #e74c3c;">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="file-name">
+                                            <div class="user-item-avatar" style="background-color: #f1c40f;">
+                                                LP
+                                            </div>
+                                            <div>
+                                                <div>Lisa Park</div>
+                                                <div class="file-size">ID: KEN-005</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>lisa.park@kengrow.com</td>
+                                    <td><span class="user-role-badge role-manager">Manager</span></td>
+                                    <td>Human Resources</td>
+                                    <td>2 days ago</td>
+                                    <td><span class="status-badge status-active">Active</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="action-btn" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn" title="Permissions">
+                                                <i class="fas fa-user-lock"></i>
+                                            </button>
+                                            <button class="action-btn" title="Delete" style="background-color: rgba(231, 76, 60, 0.1); color: #e74c3c;">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <div class="pagination">
+                            <button class="pagination-btn"><i class="fas fa-chevron-left"></i></button>
+                            <button class="pagination-btn active">1</button>
+                            <button class="pagination-btn">2</button>
+                            <button class="pagination-btn">3</button>
+                            <span class="pagination-info">...</span>
+                            <button class="pagination-btn">10</button>
+                            <button class="pagination-btn"><i class="fas fa-chevron-right"></i></button>
+                            <span class="pagination-info">Showing 1-5 of 342 users</span>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-sections">
+                        <div>
+                            <div class="section-card">
+                                <h2><i class="fas fa-user-shield"></i> Role Management</h2>
+                                <p class="mb-20">Define permissions for each user role</p>
+                                
+                                <div class="folder-structure">
+                                    <div class="folder-item">
+                                        <i class="fas fa-user-shield"></i> Administrator
+                                        <span class="user-item-role" style="margin-left: auto;">Full Access</span>
+                                    </div>
+                                    <div class="folder-item">
+                                        <i class="fas fa-user-tie"></i> Manager
+                                        <span class="user-item-role" style="margin-left: auto;">Department Access</span>
+                                    </div>
+                                    <div class="folder-item">
+                                        <i class="fas fa-user"></i> Staff
+                                        <span class="user-item-role" style="margin-left: auto;">Limited Access</span>
+                                    </div>
+                                    <div class="folder-item">
+                                        <i class="fas fa-user-clock"></i> Guest
+                                        <span class="user-item-role" style="margin-left: auto;">View Only</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-20">
+                                    <button class="btn btn-secondary">
+                                        <i class="fas fa-edit"></i> Edit Roles
+                                    </button>
+                                    <button class="btn btn-secondary">
+                                        <i class="fas fa-plus"></i> Add New Role
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="section-card">
+                                <h2><i class="fas fa-user-plus"></i> Add New User</h2>
+                                <p class="mb-20">Create a new user account</p>
+                                
+                                <div class="form-group">
+                                    <label for="newUserName">Full Name</label>
+                                    <input type="text" class="form-control" id="newUserName" placeholder="Enter full name">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="newUserEmail">Email Address</label>
+                                    <input type="email" class="form-control" id="newUserEmail" placeholder="Enter email address">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="newUserRole">User Role</label>
+                                    <select class="form-control" id="newUserRole">
+                                        <option value="staff">Staff</option>
+                                        <option value="manager">Manager</option>
+                                        <option value="admin">Administrator</option>
+                                        <option value="guest">Guest</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="newUserDepartment">Department</label>
+                                    <select class="form-control" id="newUserDepartment">
+                                        <option value="finance">Finance</option>
+                                        <option value="marketing">Marketing</option>
+                                        <option value="hr">Human Resources</option>
+                                        <option value="it">IT</option>
+                                        <option value="sales">Sales</option>
+                                        <option value="administration">Administration</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="newUserPassword">Initial Password</label>
+                                    <input type="password" class="form-control" id="newUserPassword" placeholder="Enter initial password">
+                                </div>
+                                
+                                <button class="btn btn-primary">
+                                    <i class="fas fa-user-plus"></i> Create User
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="section-card">
+                                <h2><i class="fas fa-chart-bar"></i> User Statistics</h2>
+                                <div class="mt-20">
+                                    <div class="folder-item">
+                                        <i class="fas fa-users"></i> Total Users: <strong>342</strong>
+                                    </div>
+                                    <div class="folder-item">
+                                        <i class="fas fa-user-check"></i> Active Users: <strong>312</strong>
+                                    </div>
+                                    <div class="folder-item">
+                                        <i class="fas fa-user-clock"></i> Inactive Users: <strong>30</strong>
+                                    </div>
+                                    <div class="folder-item">
+                                        <i class="fas fa-user-shield"></i> Administrators: <strong>12</strong>
+                                    </div>
+                                    <div class="folder-item">
+                                        <i class="fas fa-user-tie"></i> Managers: <strong>45</strong>
+                                    </div>
+                                    <div class="folder-item">
+                                        <i class="fas fa-user"></i> Staff: <strong>275</strong>
+                                    </div>
+                                    <div class="folder-item">
+                                        <i class="fas fa-user-plus"></i> New Users (30 days): <strong>24</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="section-card">
+                                <h2><i class="fas fa-user-times"></i> User Activity</h2>
+                                <div class="chart-container">
+                                    <div class="chart-placeholder">
+                                        <div>
+                                            <i class="fas fa-chart-line fa-2x mb-20"></i>
+                                            <p>User login activity chart</p>
+                                            <p class="mt-20">Active users: 342</p>
+                                            <p>Avg. logins per day: 287</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="section-card">
+                                <h2><i class="fas fa-history"></i> Recent Activity</h2>
+                                <p class="mb-20">Latest user actions in the system</p>
+                                
+                                <div class="folder-structure">
+                                    <div class="folder-item">
+                                        <i class="fas fa-user-plus color-primary"></i> New user "Robert Kim" added
+                                        <span style="margin-left: auto; font-size: 0.8rem;">2 hours ago</span>
+                                    </div>
+                                    <div class="folder-item">
+                                        <i class="fas fa-key color-primary"></i> Password reset for "Maria Garcia"
+                                        <span style="margin-left: auto; font-size: 0.8rem;">5 hours ago</span>
+                                    </div>
+                                    <div class="folder-item">
+                                        <i class="fas fa-user-edit color-primary"></i> Role updated for "John Smith"
+                                        <span style="margin-left: auto; font-size: 0.8rem;">Yesterday</span>
+                                    </div>
+                                    <div class="folder-item">
+                                        <i class="fas fa-user-slash color-primary"></i> User "Tom Wilson" deactivated
+                                        <span style="margin-left: auto; font-size: 0.8rem;">2 days ago</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Other Pages (Folders, Upload, Search, Workflows, Archive, Reports, Settings) -->
+                <!-- Folders Page -->
+                <div id="foldersPage" class="page-content hidden">
+                    <div class="page-title">
+                        <h1>Folders <span class="subtitle">Organize documents by department, project, or year</span></h1>
+                        <div class="quick-actions">
+                            <button class="btn btn-primary" id="createNewFolderBtn">
+                                <i class="fas fa-folder-plus"></i> New Folder
+                            </button>
+                            <button class="btn btn-secondary" id="organizeFoldersBtn">
+                                <i class="fas fa-sitemap"></i> Organize
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="section-card">
+                        <h2><i class="fas fa-sitemap"></i> Folder Structure</h2>
+                        <p class="mb-20">Drag and drop to organize folders and documents</p>
+                        
+                        <div class="folder-structure">
+                            <div class="folder-item">
+                                <i class="fas fa-folder"></i> All Documents
+                                <span class="user-item-role" style="margin-left: auto;">1,247 files</span>
+                            </div>
+                            <div class="folder-item" style="margin-left: 20px;">
+                                <i class="fas fa-folder"></i> Department Folders
+                                <span class="user-item-role" style="margin-left: auto;">8 folders</span>
+                            </div>
+                            <div class="folder-item" style="margin-left: 40px;">
+                                <i class="fas fa-folder-open color-primary"></i> Finance
+                                <span class="user-item-role" style="margin-left: auto;">324 files</span>
+                            </div>
+                            <div class="folder-item" style="margin-left: 40px;">
+                                <i class="fas fa-folder"></i> Marketing
+                                <span class="user-item-role" style="margin-left: auto;">187 files</span>
+                            </div>
+                            <div class="folder-item" style="margin-left: 40px;">
+                                <i class="fas fa-folder"></i> Human Resources
+                                <span class="user-item-role" style="margin-left: auto;">156 files</span>
+                            </div>
+                            <div class="folder-item" style="margin-left: 20px;">
+                                <i class="fas fa-folder"></i> Project Folders
+                                <span class="user-item-role" style="margin-left: auto;">12 folders</span>
+                            </div>
+                            <div class="folder-item" style="margin-left: 20px;">
+                                <i class="fas fa-folder"></i> Yearly Archives
+                                <span class="user-item-role" style="margin-left: auto;">5 folders</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Upload Page -->
+                <div id="uploadPage" class="page-content hidden">
+                    <div class="page-title">
+                        <h1>Upload Documents <span class="subtitle">Add new files to the system</span></h1>
+                        <div class="quick-actions">
+                            <button class="btn btn-secondary" id="uploadTemplatesBtn">
+                                <i class="fas fa-file-alt"></i> Templates
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="section-card">
+                        <h2><i class="fas fa-cloud-upload-alt"></i> Upload Files</h2>
+                        <p class="mb-20">Drag and drop files or click to browse. Maximum file size: 100MB</p>
+                        
+                        <div class="upload-area" id="dropArea" style="border: 2px dashed var(--medium-gray); border-radius: var(--border-radius); padding: 40px; text-align: center; cursor: pointer;">
+                            <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: var(--primary-green); margin-bottom: 15px;"></i>
+                            <h3>Drag & Drop Files Here</h3>
+                            <p class="mt-20">or</p>
+                            <button class="btn btn-primary mt-20">
+                                <i class="fas fa-folder-open"></i> Browse Files
+                            </button>
+                            <p class="mt-20">Supported formats: PDF, DOCX, XLSX, JPG, PNG, TXT</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Search Page -->
+                <div id="searchPage" class="page-content hidden">
+                    <div class="page-title">
+                        <h1>Advanced Search <span class="subtitle">Find files using powerful filters</span></h1>
+                        <div class="quick-actions">
+                            <button class="btn btn-primary" id="saveSearchBtn">
+                                <i class="fas fa-save"></i> Save Search
+                            </button>
+                            <button class="btn btn-secondary" id="clearSearchBtn">
+                                <i class="fas fa-times"></i> Clear All
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="section-card">
+                        <h2><i class="fas fa-search"></i> Search Documents</h2>
+                        <p class="mb-20">Search across all documents with advanced filters</p>
+                        
+                        <div class="search-box" style="width: 100%; margin-bottom: 20px;">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Enter keywords, file names, or content...">
+                        </div>
+                        
+                        <table class="document-list">
+                            <thead>
+                                <tr>
+                                    <th>File Name</th>
+                                    <th>Type</th>
+                                    <th>Department</th>
+                                    <th>Last Modified</th>
+                                    <th>Relevance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="file-name">
+                                            <div class="file-icon pdf">
+                                                <i class="fas fa-file-pdf"></i>
+                                            </div>
+                                            <div>
+                                                <div>Q2 Financial Report 2025.pdf</div>
+                                                <div class="file-size">3.2 MB</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>PDF</td>
+                                    <td>Finance</td>
+                                    <td>2025/06/09</td>
+                                    <td><span class="status-badge status-active">98%</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Workflows Page -->
+                <div id="workflowsPage" class="page-content hidden">
+                    <div class="page-title">
+                        <h1>Workflows & Approvals <span class="subtitle">Manage document approval processes</span></h1>
+                        <div class="quick-actions">
+                            <button class="btn btn-primary" id="newWorkflowBtn">
+                                <i class="fas fa-plus"></i> New Workflow
+                            </button>
+                            <button class="btn btn-secondary" id="workflowTemplatesBtn">
+                                <i class="fas fa-copy"></i> Templates
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="section-card">
+                        <h2><i class="fas fa-tasks"></i> My Approvals <span class="badge">12 pending</span></h2>
+                        <p class="mb-20">Documents waiting for your review and approval</p>
+                        
+                        <table class="document-list">
+                            <thead>
+                                <tr>
+                                    <th>Document</th>
+                                    <th>Type</th>
+                                    <th>Requester</th>
+                                    <th>Submitted</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="file-name">
+                                            <div class="file-icon pdf">
+                                                <i class="fas fa-file-pdf"></i>
+                                            </div>
+                                            <div>
+                                                <div>New Client Contract.pdf</div>
+                                                <div class="file-size">2.8 MB</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Contract</td>
+                                    <td>John Smith</td>
+                                    <td>2025/06/09</td>
+                                    <td><span class="status-badge status-pending">Awaiting Approval</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="action-btn" title="Approve" style="background-color: #2ecc71; color: white;">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                            <button class="action-btn" title="Reject" style="background-color: #e74c3c; color: white;">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Archive Page -->
+                <div id="archivePage" class="page-content hidden">
+                    <div class="page-title">
+                        <h1>Archive <span class="subtitle">Retired documents and historical records</span></h1>
+                        <div class="quick-actions">
+                            <button class="btn btn-secondary" id="bulkArchiveBtn">
+                                <i class="fas fa-archive"></i> Bulk Archive
+                            </button>
+                            <button class="btn btn-secondary" id="exportArchiveBtn">
+                                <i class="fas fa-download"></i> Export
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="section-card">
+                        <h2><i class="fas fa-archive"></i> Archived Documents <span class="badge">428 files</span></h2>
+                        <p class="mb-20">Read-only access to archived documents. Retention policies apply.</p>
+                        
+                        <table class="document-list">
+                            <thead>
+                                <tr>
+                                    <th>File Name</th>
+                                    <th>Type</th>
+                                    <th>Archived Date</th>
+                                    <th>Retention Until</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="file-name">
+                                            <div class="file-icon pdf">
+                                                <i class="fas fa-file-pdf"></i>
+                                            </div>
+                                            <div>
+                                                <div>2023 Financial Report.pdf</div>
+                                                <div class="file-size">4.2 MB</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>PDF</td>
+                                    <td>2024/01/15</td>
+                                    <td>2028/01/15</td>
+                                    <td><span class="status-badge status-archived">Archived</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="action-btn" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn" title="Restore">
+                                                <i class="fas fa-history"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Reports Page -->
+                <div id="reportsPage" class="page-content hidden">
+                    <div class="page-title">
+                        <h1>Reports & Analytics <span class="subtitle">Insights and system metrics</span></h1>
+                        <div class="quick-actions">
+                            <button class="btn btn-primary" id="generateReportBtn">
+                                <i class="fas fa-plus"></i> Generate Report
+                            </button>
+                            <button class="btn btn-secondary" id="exportReportBtn">
+                                <i class="fas fa-download"></i> Export
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-overview">
+                        <div class="stat-card">
+                            <div class="stat-icon documents">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>24%</h3>
+                                <p>Growth This Month</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon storage">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>342</h3>
+                                <p>Active Users</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon pending">
+                                <i class="fas fa-file-download"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>1,245</h3>
+                                <p>Total Downloads</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon uploads">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>6,712</h3>
+                                <p>Total Views</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-card">
+                        <h2><i class="fas fa-chart-bar"></i> Document Growth</h2>
+                        <p class="mb-20">Monthly document uploads over the past year</p>
+                        <div class="chart-container">
+                            <div class="chart-placeholder">
+                                <div>
+                                    <i class="fas fa-chart-line fa-3x mb-20"></i>
+                                    <p>Document growth chart showing monthly uploads</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Settings Page -->
+                <div id="settingsPage" class="page-content hidden">
+                    <div class="page-title">
+                        <h1>Settings <span class="subtitle">Configure system and personal preferences</span></h1>
+                        <div class="quick-actions">
+                            <button class="btn btn-primary" id="editSettingsBtn">
+                                <i class="fas fa-edit"></i> Edit Settings
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="section-card">
+                        <h2><i class="fas fa-user-cog"></i> Personal Settings</h2>
+                        <p class="mb-20">Manage your account preferences and settings</p>
+                        
+                        <div class="form-group">
+                            <label for="profileName">Full Name</label>
+                            <input type="text" class="form-control" id="profileName" value="Amyya U. Wu">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="profileEmail">Email Address</label>
+                            <input type="email" class="form-control" id="profileEmail" value="amyya.wu@kengrow.com">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="profileDepartment">Department</label>
+                            <select class="form-control" id="profileDepartment">
+                                <option value="administration" selected>Administration</option>
+                                <option value="finance">Finance</option>
+                                <option value="marketing">Marketing</option>
+                                <option value="hr">Human Resources</option>
+                            </select>
+                        </div>
+                        
+                        <button class="btn btn-primary mt-20">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-content">
+                <div class="copyright">
+                    &copy; 2025 KENGROW Technologies. All rights reserved.
+                </div>
+                <div class="footer-links">
+                    <a href="#">Help / Support</a>
+                    <a href="#">User Guide</a>
+                    <a href="#">Privacy Policy</a>
+                </div>
+                <div class="footer-version">
+                    KENGROW File Manager v2.1.4
+                </div>
+            </div>
+        </div>
+        
+        <!-- Logout Modal -->
+        <div class="modal-overlay logout-modal" id="logoutModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3>Confirm Logout</h3>
+                    <button class="modal-close" id="closeLogoutModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="logout-modal-content">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <h3>Are you sure you want to logout?</h3>
+                        <p>You will be redirected to the login page. Any unsaved changes will be lost.</p>
+                        
+                        <div class="logout-modal-actions" style="display: flex; gap: 15px; justify-content: center; margin-top: 30px;">
+                            <button class="btn btn-danger" id="confirmLogoutBtn">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </button>
+                            <button class="btn btn-secondary" id="cancelLogoutBtn">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Notification Toast (Hidden by default) -->
+        <div class="notification-toast" id="notificationToast">
+            <div class="toast-icon" style="background-color: rgba(155, 89, 182, 0.1); color: #9b59b6;">
+                <i class="fas fa-upload"></i>
+            </div>
+            <div class="toast-content">
+                <div class="toast-title" id="toastTitle">New Document Uploaded</div>
+                <div class="toast-message" id="toastMessage">Document "Q2 Report.pdf" has been uploaded</div>
+            </div>
+            <button class="toast-close" id="toastClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const loginPage = document.getElementById('loginPage');
+        const appContainer = document.getElementById('appContainer');
+        const loginForm = document.getElementById('loginForm');
+        const roleOptions = document.querySelectorAll('.role-option');
+        const forgotPassword = document.getElementById('forgotPassword');
+        const sidebar = document.getElementById('sidebar');
+        const mobileToggle = document.getElementById('mobileToggle');
+        const menuItems = document.querySelectorAll('.menu-item');
+        const contentArea = document.getElementById('contentArea');
+        const pageContents = document.querySelectorAll('.page-content');
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const homeCrumb = document.getElementById('homeCrumb');
+        const pageCrumb = document.getElementById('pageCrumb');
+        const timeDisplay = document.getElementById('timeDisplay');
+        const currentTime = document.getElementById('currentTime');
+        const loginTimeDisplay = document.getElementById('loginTimeDisplay');
+        const loggedInUserName = document.getElementById('loggedInUserName');
+        const loggedInUserRole = document.getElementById('loggedInUserRole');
+        const userAvatar = document.getElementById('userAvatar');
+        const dashboardUserName = document.getElementById('dashboardUserName');
+        const onlineUsersList = document.getElementById('onlineUsersList');
+        const onlineUsersCount = document.getElementById('onlineUsersCount');
+        const onlineCount = document.getElementById('onlineCount');
+        const activeUsersBadge = document.getElementById('activeUsersBadge');
+        
+        // Logout Elements
+        const sidebarLogoutBtn = document.getElementById('sidebarLogoutBtn');
+        const headerLogoutBtn = document.getElementById('headerLogoutBtn');
+        const logoutModal = document.getElementById('logoutModal');
+        const closeLogoutModal = document.getElementById('closeLogoutModal');
+        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+        const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+        
+        // Application State
+        let userRole = 'staff';
+        let userName = '';
+        let userEmail = '';
+        let loginTime = null;
+        let isDarkMode = false;
+        let clockInterval = null;
+        let notificationInterval = null;
+        
+        // Online Users Data
+        const onlineUsers = [
+            { id: 1, name: "Amyya U. Wu", role: "Admin", status: "online", initials: "AU", color: "#1E7F4B" },
+            { id: 2, name: "John Smith", role: "Manager", status: "online", initials: "JS", color: "#3498db" },
+            { id: 3, name: "Maria Garcia", role: "Staff", status: "online", initials: "MG", color: "#9b59b6" },
+            { id: 4, name: "David Chen", role: "Staff", status: "away", initials: "DC", color: "#e74c3c" },
+            { id: 5, name: "Lisa Park", role: "Manager", status: "online", initials: "LP", color: "#f1c40f" }
+        ];
+        
+        // Initialize the application
+        function initApp() {
+            // Check for saved theme preference
+            const savedTheme = localStorage.getItem('kengrow-theme');
+            if (savedTheme === 'dark') {
+                enableDarkMode();
+            } else {
+                enableLightMode();
+            }
+            
+            // Check screen width for logout button visibility
+            checkScreenWidth();
+            window.addEventListener('resize', checkScreenWidth);
+            
+            // Login form submission
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                
+                // Simple validation
+                if (email && password) {
+                    // Store user info
+                    userEmail = email;
+                    userName = extractUserName(email);
+                    
+                    // Record login time
+                    loginTime = new Date();
+                    
+                    // In a real app, you would send this to a server
+                    console.log(`Logging in with email: ${email}, role: ${userRole}, name: ${userName}`);
+                    
+                    // Show the main application
+                    loginPage.classList.add('hidden');
+                    appContainer.classList.remove('hidden');
+                    
+                    // Set the user role for UI customization
+                    updateUIForRole();
+                    
+                    // Update user display
+                    updateUserDisplay();
+                    
+                    // Initialize online users display
+                    displayOnlineUsers();
+                    
+                    // Start the clock
+                    updateClock();
+                    clockInterval = setInterval(updateClock, 1000);
+                    
+                    // Simulate user joining online list
+                    addUserToOnlineList();
+                    
+                    // Start notification simulation
+                    startNotificationSimulation();
+                } else {
+                    alert('Please enter both email and password.');
+                }
+            });
+            
+            // Role selection
+            roleOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    roleOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    userRole = this.getAttribute('data-role');
+                });
+            });
+            
+            // Forgot password
+            forgotPassword.addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Password reset link would be sent to your email in a real application.');
+            });
+            
+            // Mobile sidebar toggle
+            mobileToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('open');
+            });
+            
+            // Menu navigation
+            menuItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Update active menu item
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Get the page to show
+                    const page = this.getAttribute('data-page');
+                    
+                    // Show the corresponding page
+                    showPage(page);
+                    
+                    // Update breadcrumb
+                    updateBreadcrumb(page);
+                    
+                    // Close mobile sidebar if open
+                    if (window.innerWidth <= 992) {
+                        sidebar.classList.remove('open');
+                    }
+                });
+            });
+            
+            // Theme toggle
+            themeToggle.addEventListener('click', toggleTheme);
+            
+            // Logout buttons
+            sidebarLogoutBtn.addEventListener('click', showLogoutModal);
+            headerLogoutBtn.addEventListener('click', showLogoutModal);
+            
+            // Logout modal
+            closeLogoutModal.addEventListener('click', hideLogoutModal);
+            cancelLogoutBtn.addEventListener('click', hideLogoutModal);
+            confirmLogoutBtn.addEventListener('click', performLogout);
+            
+            // Close modal when clicking outside
+            logoutModal.addEventListener('click', function(e) {
+                if (e.target === logoutModal) {
+                    hideLogoutModal();
+                }
+            });
+            
+            // Set default role selection
+            document.querySelector('.role-option[data-role="staff"]').classList.add('selected');
+            
+            // Simulate user status changes (for demo purposes)
+            simulateUserStatusChanges();
+        }
+        
+        // Check screen width for responsive logout button
+        function checkScreenWidth() {
+            if (window.innerWidth <= 768) {
+                headerLogoutBtn.style.display = 'flex';
+                sidebarLogoutBtn.style.display = 'none';
+            } else {
+                headerLogoutBtn.style.display = 'none';
+                sidebarLogoutBtn.style.display = 'block';
+            }
+        }
+        
+        // Theme Functions
+        function toggleTheme() {
+            if (isDarkMode) {
+                enableLightMode();
+            } else {
+                enableDarkMode();
+            }
+        }
+        
+        function enableDarkMode() {
+            document.body.classList.add('dark-mode');
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
+            isDarkMode = true;
+            localStorage.setItem('kengrow-theme', 'dark');
+        }
+        
+        function enableLightMode() {
+            document.body.classList.remove('dark-mode');
+            themeIcon.classList.remove('fa-sun');
+            themeIcon.classList.add('fa-moon');
+            isDarkMode = false;
+            localStorage.setItem('kengrow-theme', 'light');
+        }
+        
+        // Logout Functions
+        function showLogoutModal() {
+            logoutModal.classList.add('show');
+        }
+        
+        function hideLogoutModal() {
+            logoutModal.classList.remove('show');
+        }
+        
+        function performLogout() {
+            // Hide logout modal
+            hideLogoutModal();
+            
+            // Stop intervals
+            if (clockInterval) {
+                clearInterval(clockInterval);
+                clockInterval = null;
+            }
+            
+            if (notificationInterval) {
+                clearInterval(notificationInterval);
+                notificationInterval = null;
+            }
+            
+            // Remove user from online list
+            removeUserFromOnlineList();
+            
+            // Reset form
+            loginForm.reset();
+            roleOptions.forEach(opt => opt.classList.remove('selected'));
+            document.querySelector('.role-option[data-role="staff"]').classList.add('selected');
+            
+            // Reset application state
+            userRole = 'staff';
+            userName = '';
+            userEmail = '';
+            loginTime = null;
+            
+            // Hide app, show login page
+            appContainer.classList.add('hidden');
+            loginPage.classList.remove('hidden');
+            
+            // Show logout success message
+            alert('You have been successfully logged out.');
+        }
+        
+        // Other existing functions...
+        function extractUserName(email) {
+            let namePart = email.split('@')[0];
+            namePart = namePart.replace(/[._]/g, ' ');
+            namePart = namePart.split(' ')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+            return namePart || 'User';
+        }
+        
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true 
+            });
+            const dateString = now.toLocaleDateString('en-US', {
+                weekday: 'short',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+            timeDisplay.textContent = `${dateString} • ${timeString}`;
+        }
+        
+        function updateUserDisplay() {
+            loggedInUserName.textContent = userName;
+            dashboardUserName.textContent = userName.split(' ')[0];
+            
+            let roleDisplay = '';
+            switch(userRole) {
+                case 'admin': roleDisplay = 'Administrator'; break;
+                case 'manager': roleDisplay = 'Manager'; break;
+                case 'staff': roleDisplay = 'Staff Member'; break;
+                default: roleDisplay = 'User';
+            }
+            loggedInUserRole.textContent = roleDisplay;
+            
+            const initials = getInitials(userName);
+            userAvatar.textContent = initials;
+            userAvatar.style.backgroundColor = getColorFromName(userName);
+            
+            if (loginTime) {
+                const loginTimeString = loginTime.toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: true 
+                });
+                const loginDateString = loginTime.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    month: 'short',
+                    day: 'numeric'
+                });
+                loginTimeDisplay.textContent = `Logged in: ${loginDateString}, ${loginTimeString}`;
+            }
+        }
+        
+        function getInitials(name) {
+            return name.split(' ')
+                .map(part => part.charAt(0))
+                .join('')
+                .toUpperCase()
+                .substring(0, 2);
+        }
+        
+        function getColorFromName(name) {
+            const colors = ['#1E7F4B', '#3498db', '#9b59b6', '#e74c3c', '#f1c40f', '#1abc9c', '#d35400', '#2c3e50'];
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) {
+                hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            const index = Math.abs(hash) % colors.length;
+            return colors[index];
+        }
+        
+        function displayOnlineUsers() {
+            onlineUsersList.innerHTML = '';
+            const activeUsers = onlineUsers.filter(user => user.status !== 'offline');
+            const onlineCountValue = activeUsers.filter(user => user.status === 'online').length;
+            
+            onlineUsersCount.textContent = activeUsers.length;
+            onlineCount.textContent = onlineCountValue;
+            activeUsersBadge.innerHTML = `<i class="fas fa-user-friends"></i> ${onlineCountValue} online`;
+            
+            activeUsers.forEach(user => {
+                const userItem = document.createElement('div');
+                userItem.className = 'user-item';
+                let statusClass = user.status === 'online' ? 'status-online' : 'status-away';
+                
+                userItem.innerHTML = `
+                    <div class="user-item-avatar" style="background-color: ${user.color}">
+                        ${user.initials}
+                        <div class="user-item-status ${statusClass}"></div>
+                    </div>
+                    <div class="user-item-info">
+                        <h4>${user.name}</h4>
+                        <p>${user.status === 'online' ? 'Active now' : 'Away'}</p>
+                    </div>
+                    <div class="user-item-role">${user.role}</div>
+                `;
+                onlineUsersList.appendChild(userItem);
+            });
+        }
+        
+        function addUserToOnlineList() {
+            const existingUserIndex = onlineUsers.findIndex(user => 
+                user.name.toLowerCase() === userName.toLowerCase()
+            );
+            
+            if (existingUserIndex === -1) {
+                const userInitials = getInitials(userName);
+                const userColor = getColorFromName(userName);
+                onlineUsers.unshift({
+                    id: onlineUsers.length + 1,
+                    name: userName,
+                    role: userRole === 'admin' ? 'Admin' : userRole === 'manager' ? 'Manager' : 'Staff',
+                    status: 'online',
+                    initials: userInitials,
+                    color: userColor
+                });
+                displayOnlineUsers();
+            } else {
+                onlineUsers[existingUserIndex].status = 'online';
+                displayOnlineUsers();
+            }
+        }
+        
+        function removeUserFromOnlineList() {
+            const userIndex = onlineUsers.findIndex(user => 
+                user.name.toLowerCase() === userName.toLowerCase()
+            );
+            
+            if (userIndex !== -1) {
+                onlineUsers[userIndex].status = 'offline';
+            }
+        }
+        
+        function simulateUserStatusChanges() {
+            setInterval(() => {
+                const randomIndex = Math.floor(Math.random() * onlineUsers.length);
+                const randomUser = onlineUsers[randomIndex];
+                if (randomUser.name !== userName) {
+                    randomUser.status = randomUser.status === 'online' ? 'away' : 'online';
+                    displayOnlineUsers();
+                }
+            }, 30000);
+        }
+        
+        // Simulate receiving new notifications
+        function startNotificationSimulation() {
+            // Clear any existing interval
+            if (notificationInterval) {
+                clearInterval(notificationInterval);
+            }
+            
+            // Add a new notification every 30-60 seconds
+            notificationInterval = setInterval(() => {
+                // Show a toast notification
+                showToastNotification();
+            }, Math.random() * 30000 + 30000); // Between 30-60 seconds
+        }
+        
+        function showToastNotification() {
+            const notifications = [
+                {
+                    title: 'New Document Uploaded',
+                    message: `Document "${getRandomFileName()}" has been uploaded`,
+                    icon: 'fas fa-upload'
+                },
+                {
+                    title: 'Approval Required',
+                    message: 'A new document requires your review and approval',
+                    icon: 'fas fa-check-circle'
+                },
+                {
+                    title: 'System Update',
+                    message: 'Weekly maintenance completed successfully',
+                    icon: 'fas fa-cog'
+                },
+                {
+                    title: 'New Comment',
+                    message: `${getRandomUserName()} commented on a document`,
+                    icon: 'fas fa-comment'
+                }
+            ];
+            
+            const randomNotification = notifications[Math.floor(Math.random() * notifications.length)];
+            const toast = document.getElementById('notificationToast');
+            const toastTitle = document.getElementById('toastTitle');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastIcon = toast.querySelector('.toast-icon i');
+            
+            toastTitle.textContent = randomNotification.title;
+            toastMessage.textContent = randomNotification.message;
+            toastIcon.className = randomNotification.icon;
+            
+            // Show toast
+            toast.classList.add('show');
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 5000);
+            
+            // Close button
+            document.getElementById('toastClose').addEventListener('click', function() {
+                toast.classList.remove('show');
+            });
+        }
+        
+        function getRandomFileName() {
+            const fileNames = [
+                'Q3 Financial Report.pdf',
+                'Marketing Plan Q4.docx',
+                'Employee Survey Results.xlsx',
+                'Project Timeline.pptx',
+                'Client Presentation.pdf'
+            ];
+            return fileNames[Math.floor(Math.random() * fileNames.length)];
+        }
+        
+        function getRandomUserName() {
+            const names = ['John Smith', 'Maria Garcia', 'David Chen', 'Lisa Park', 'Robert Johnson'];
+            return names[Math.floor(Math.random() * names.length)];
+        }
+        
+        function showPage(page) {
+            // Hide all pages
+            pageContents.forEach(content => content.classList.add('hidden'));
+            
+            // Show the requested page
+            const pageElement = document.getElementById(`${page}Page`);
+            if (pageElement) {
+                pageElement.classList.remove('hidden');
+            } else {
+                // Default to dashboard if page doesn't exist
+                document.getElementById('dashboardPage').classList.remove('hidden');
+            }
+            
+            // Check if user has permission to access admin pages
+            if (page === 'users' && userRole !== 'admin') {
+                alert('You do not have permission to access the Users page.');
+                showPage('dashboard');
+                return;
+            }
+        }
+        
+        function updateBreadcrumb(page) {
+            const pageNames = {
+                dashboard: 'Dashboard',
+                documents: 'Documents',
+                folders: 'Folders',
+                upload: 'Upload',
+                search: 'Search',
+                workflows: 'Workflows',
+                archive: 'Archive',
+                reports: 'Reports',
+                users: 'User Management',
+                settings: 'Settings'
+            };
+            pageCrumb.textContent = pageNames[page] || 'Dashboard';
+        }
+        
+        function updateUIForRole() {
+            const adminElements = document.querySelectorAll('.admin-only');
+            if (userRole === 'admin') {
+                adminElements.forEach(el => {
+                    if (el.classList.contains('menu-item')) {
+                        el.style.display = 'flex';
+                    } else {
+                        el.style.display = 'block';
+                    }
+                });
+            } else {
+                adminElements.forEach(el => {
+                    el.style.display = 'none';
+                });
+            }
+        }
+        
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', initApp);
+        
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(e) {
+            if (window.innerWidth <= 992 && 
+                !sidebar.contains(e.target) && 
+                !mobileToggle.contains(e.target) &&
+                sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+            }
+        });
+    </script>
+</body>
+</html>
